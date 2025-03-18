@@ -137,3 +137,26 @@
   object-fit: cover;
   border-radius: 10px;
 }
+
+.buttonContainer {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.customButton {
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.customButton:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+}

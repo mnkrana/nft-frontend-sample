@@ -1,4 +1,3 @@
-import { useAccount } from "wagmi";
 import { contractABI } from "../utils/contractABI";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -12,8 +11,10 @@ import { useRouter } from "next/router";
 const CONTRACT_ADDRESS = "0xDB929853F31f9cfccF753A2Cec27c6A37c9D8bFa";
 const TOKEN_IDS = Array.from({ length: 37 }, (_, i) => i + 1);
 
-const Home: NextPage = () => {
-  const { address, isConnected } = useAccount();
+const BuyNFT: NextPage = () => {    
+  const address  = "0xB9160721D278482F153ae7eE9DFb037471228810";
+  const isConnected = true;
+
   const [nfts, setNfts] = useState<{ name: string; image: string }[]>([]);
   const router = useRouter();
 
@@ -81,16 +82,13 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         <ConnectButton />
 
-        <h1 className={styles.title}>Welcome to Rana Art Collection Marketplace</h1>
-        
-
         <div className={styles.buttonContainer}>        
-          <button className={styles.customButton} onClick={() => router.push("/buy")}>
-            Explore NFTs
+          <button className={styles.customButton} onClick={() => router.push("/")}>
+            See your NFTs
           </button>
         </div>
         
-        <p className={styles.description}><br></br>Your Art Collection</p>
+        <p className={styles.description}><br></br>Rana's Art Collection</p>
 
         {isConnected ? (
           <div className={styles.nftGrid}>
@@ -113,4 +111,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default BuyNFT;
