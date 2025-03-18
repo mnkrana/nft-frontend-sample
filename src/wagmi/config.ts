@@ -1,5 +1,5 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
 import { puppynet } from "./chains";
 
 export const config = getDefaultConfig({
@@ -11,6 +11,12 @@ export const config = getDefaultConfig({
 
 // Create a public client for contract reads
 export const publicClient = createPublicClient({
+  chain: puppynet,
+  transport: http(),
+});
+
+// Create a wallet client for signing transactions
+export const walletClient = createWalletClient({
   chain: puppynet,
   transport: http(),
 });
