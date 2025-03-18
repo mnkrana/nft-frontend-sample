@@ -100,3 +100,17 @@
     flex-direction: column;
   }
 }
+
+.nftContainer {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #1a1a1a;
+  text-align: center;
+}
+
+.nftImage {
+  width: 200px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
