@@ -99,14 +99,14 @@ const BuyNFT: NextPage = () => {
         functionName: "purchase",
         args: [tokenId],
         account: address,
-        value: price,
+        value: price as bigint,
       });
 
       console.log("Transaction sent:", tx);
       alert(`NFT #${tokenId} purchase successful!`);
     } catch (error) {
       console.error(`Error purchasing NFT #${tokenId}:`, error);
-      alert(`Purchase failed: ${error.message}`);
+      alert(`Purchase failed: ${(error as Error).message}`);
     }
   };
 
