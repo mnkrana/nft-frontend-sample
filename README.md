@@ -19,3 +19,11 @@ Check out the [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ## Check it out here
 
 https://nft-frontend-sample-hk1z.vercel.app/
+
+### Home page
+
+![Home](./images/home.png)
+
+### Buy page
+
+![Home](./images/explore.png)
