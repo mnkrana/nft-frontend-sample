@@ -16,11 +16,13 @@ const Home: NextPage = () => {
   const { address, isConnected } = useAccount();
   const [nfts, setNfts] = useState<{ name: string; image: string }[]>([]);
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!address || !isConnected) return;
 
     const fetchNFTs = async () => {
+      setLoading(true);
       let ownedNFTs: { name: string; image: string }[] = [];
 
       for (const id of TOKEN_IDS) {
@@ -37,6 +39,7 @@ const Home: NextPage = () => {
         }
       }
       setNfts(ownedNFTs);
+      setLoading(false);
     };
 
     fetchNFTs();
@@ -82,25 +85,30 @@ const Home: NextPage = () => {
         <ConnectButton />
 
         <h1 className={styles.title}>Welcome to Rana Art Collection Marketplace</h1>
-        
 
-        <div className={styles.buttonContainer}>        
+        <div className={styles.buttonContainer}>
           <button className={styles.customButton} onClick={() => router.push("/buy")}>
             Explore NFTs
           </button>
         </div>
-        
-        <p className={styles.description}><br></br>Your Art Collection</p>
+
+        <p className={styles.description}>
+          <br></br>Your Art Collection
+        </p>
 
         {isConnected ? (
           <div className={styles.nftGrid}>
-            {nfts.length > 0 ? (
-              nfts.map((nft) => (
-                <div key={nft.name} className={styles.nftCard}>
-                  <img src={nft.image} alt={nft.name} />
-                  <p>{nft.name}</p>
-                </div>
-              ))
+            {loading ? (
+              <div className={styles.loader}></div>
+            ) : nfts.length > 0 ? (
+              <div className={styles.nftGrid}>
+                {nfts.map((nft) => (
+                  <div key={nft.name} className={styles.nftCard}>
+                    <img src={nft.image} alt={nft.name} />
+                    <p>{nft.name}</p>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p>No NFTs owned.</p>
             )}
