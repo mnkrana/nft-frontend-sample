@@ -1,19 +1,91 @@
-import { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
+import { contractABI } from "../utils/contractABI";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { fetchNFTs } from "../utils/fetchNFTs";
+import { publicClient } from "../wagmi/config";
 
-const Home = () => {
+const CONTRACT_ADDRESS = "0xDB929853F31f9cfccF753A2Cec27c6A37c9D8bFa"; // Replace with your actual contract address
+const TOKEN_IDS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+  21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37
+];
+
+
+const Home: NextPage = () => {
   const { address, isConnected } = useAccount();
-  const [nft, setNft] = useState<{ image: string; name: string; description: string } | null>(null);
+  const [nfts, setNfts] = useState<{ id: number; name: string; image: string }[]>([]);
 
   useEffect(() => {
-    if (isConnected && address) {
-      fetchNFTs(address).then(setNft);
-    }
+    if (!address || !isConnected) return;
+
+    const fetchNFTs = async () => {
+      let ownedNFTs: { id: number; name: string; image: string }[] = [];
+
+      for (const id of TOKEN_IDS) {
+        try {
+          const balance = await readBalance(id);
+          
+          if (balance > 0) { // Ensure proper bigint comparison
+            const metadata = await fetchMetadata(id);
+            if (metadata?.image && metadata?.name) {
+              ownedNFTs.push({ id, name: metadata.name, image: metadata.image });
+            }
+          }
+        } catch (error) {
+          console.error(`Error reading balance for token ${id}:`, error);
+        }
+      }
+
+      setNfts(ownedNFTs);
+    };
+
+    fetchNFTs();
   }, [address, isConnected]);
+
+  // Reads balance of each token for the connected user
+  const readBalance = async (tokenId: number) => {
+    try {
+      const result = await publicClient.readContract({
+        address: CONTRACT_ADDRESS,
+        abi: contractABI,
+        functionName: "balanceOf",
+        args: [address, tokenId],
+      });
+
+      return result as bigint; // Ensure the return type is bigint
+    } catch (error) {
+      console.error(`Error fetching balance for token ${tokenId}:`, error);
+      return 0;
+    }
+  };
+
+// Fetch metadata (image, name, etc.) from URI
+const fetchMetadata = async (tokenId: number) => {
+  try {
+    const uri = `https://ipfs.io/ipfs/Qmb269DT2JWVq6AyibidEkDQ99CwMHsZTvwYy3AEBrfa11/${tokenId}.json`;
+    const response = await axios.get(uri);
+    
+    if (!response.data || !response.data.image || !response.data.name) {
+      console.error(`Metadata missing for token ${tokenId}`, response.data);
+      return null;
+    }
+
+    // Ensure correct formatting of the IPFS image URL
+    let imageUrl = response.data.image;
+    if (imageUrl.startsWith("ipfs://")) {
+      imageUrl = imageUrl.replace("ipfs://", "https://ipfs.io/ipfs/");
+    }
+
+    return { name: response.data.name, image: imageUrl };
+  } catch (error) {
+    console.error(`Error fetching metadata for token ${tokenId}:`, error);
+    return null;
+  }
+};
 
   return (
     <div className={styles.container}>
@@ -25,24 +97,31 @@ const Home = () => {
 
       <main className={styles.main}>
         <ConnectButton />
-        <h1 className={styles.title}>
-          Welcome to <a href="https://puppyscan.shib.io/token/0xDB929853F31f9cfccF753A2Cec27c6A37c9D8bFa">Rana Art Collection</a> Marketplace
-        </h1>
+
+        <h1 className={styles.title}>Welcome to Rana Art Collection Marketplace</h1>
+
         <p className={styles.description}>Buy Rana Art Collection</p>
 
-        {nft ? (
-          <div className={styles.nftContainer}>
-            <h2>{nft.name}</h2>
-            <img src={nft.image} alt={nft.name} className={styles.nftImage} />
-            <p>{nft.description}</p>
+        {isConnected ? (
+          <div className={styles.nftGrid}>
+            {nfts.length > 0 ? (
+              nfts.map((nft) => (
+                <div key={nft.id} className={styles.nftCard}>
+                  <img src={nft.image} alt={nft.name} />
+                  <p>{nft.name}</p> {/* Show NFT Name */}
+                </div>
+              ))
+            ) : (
+              <p>No NFTs owned.</p>
+            )}
           </div>
         ) : (
-          <p>No NFTs found</p>
+          <p>Connect your wallet to see your NFTs.</p>
         )}
       </main>
 
       <footer className={styles.footer}>
-        <a href="https://mayankrana.in" target="_blank" rel="noopener noreferrer">
+        <a href="https://mayankrana.in" rel="noopener noreferrer" target="_blank">
           Made with ❤️ by Mayank Rana
         </a>
       </footer>
