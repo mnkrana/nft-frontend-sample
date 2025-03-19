@@ -6,20 +6,20 @@ const CONTRACT_ADDRESS = "0xDB929853F31f9cfccF753A2Cec27c6A37c9D8bFa"; // Your N
 
 export const fetchNFTs = async (walletAddress: string) => {
   try {
-    const balance = await readContract(config, {
+    const balance = (await readContract(config, {
       address: CONTRACT_ADDRESS,
       abi: contractABI,
       functionName: "balanceOf",
       args: [walletAddress, 10],
-    }) as bigint;
+    })) as bigint;
 
     if (balance > 0) {
-      const tokenURI = await readContract(config, {
+      const tokenURI = (await readContract(config, {
         address: CONTRACT_ADDRESS,
         abi: contractABI,
         functionName: "uri",
         args: [1],
-      }) as string;
+      })) as string;
 
       const response = await fetch(tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/"));
       const metadata = await response.json();
