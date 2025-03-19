@@ -104,6 +104,29 @@ const BuyNFT: NextPage = () => {
 
       console.log("Transaction sent:", tx);
       alert(`NFT #${tokenId} purchase successful!`);
+
+      // Send POST request with the transaction hash
+      const response = await fetch("https://ifnsdx2q22.execute-api.ap-south-1.amazonaws.com/dev/tx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tx }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
+
+      const textResponse = await response.json();
+      if (textResponse.trim().toLowerCase() === "success") {
+        console.log("Transaction successfully.");
+        alert("Transaction purchased NFT!");
+        router.push("/");
+      } else {
+        console.error("Server response indicates failure:", textResponse);
+        alert(`Transaction failed on the server: ${textResponse}`);
+      }
     } catch (error) {
       console.error(`Error purchasing NFT #${tokenId}:`, error);
       alert(`Purchase failed: ${(error as Error).message}`);
