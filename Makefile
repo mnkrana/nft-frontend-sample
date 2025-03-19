@@ -1,0 +1,2 @@
+format:
+	yarn prettier --write .
